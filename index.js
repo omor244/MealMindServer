@@ -21,7 +21,7 @@ async function run() {
     const db = client.db("MEAL-MIND")
     const usercoll = db.collection('users')
     const recipescoll = db.collection('recipes')
-    const cookbookcoll = db.collection('cookbook')
+    const weeklyPlancoll = db.collection('weeklyPlan')
     try {
 
         app.post('/users', async (req, res) => {
@@ -51,8 +51,15 @@ async function run() {
 
             const { search = "" } = req.query
             console.log(search)
-            
-            const result = await recipescoll.find().toArray()
+
+            const tremmedSearch = search.trim()
+
+            const query = {}
+
+            if (tremmedSearch.length > 0) {
+                query.name = {$regex: tremmedSearch, $options: 'i'}
+            }
+            const result = await recipescoll.find(query).toArray()
             res.send(result)
         })
         app.get("/recipes/:id", async (req, res) => {
@@ -65,10 +72,10 @@ async function run() {
         // cook-book
 
 
-        app.post("/cook-book", async (req, res) => {
+        app.post("/weeklyPlan", async (req, res) => {
 
             const data = req.body
-            const result = await cookbookcoll.insertOne(data)
+            const result = await weeklyPlancoll.insertOne(data)
             res.send(result)
         })
 
