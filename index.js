@@ -3,7 +3,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
-const port = 3000 || process.env.PORT 
+const port = 3000 || process.env.PORT
 
 
 app.use(cors())
@@ -21,37 +21,57 @@ async function run() {
     const db = client.db("MEAL-MIND")
     const usercoll = db.collection('users')
     const recipescoll = db.collection('recipes')
+    const cookbookcoll = db.collection('cookbook')
     try {
 
         app.post('/users', async (req, res) => {
-         
-            const data = req.body 
+
+            const data = req.body
             data.createdAt = new Date().toISOString()
             data.role = "user"
 
             const isexist = await usercoll.findOne({ email: data.email })
             if (isexist) {
-                return res.send({massage: "Already have this account"})
+                return res.send({ massage: "Already have this account" })
             }
             else {
                 const result = await usercoll.insertOne(data)
                 res.send(result)
-                
+
             }
 
         })
         app.post("/recipes", async (req, res) => {
-            
+
             const data = req.body
             const result = await recipescoll.insertOne(data)
             res.send(result)
         })
         app.get("/recipes", async (req, res) => {
-           
+
+            const { search = "" } = req.query
+            console.log(search)
+            
             const result = await recipescoll.find().toArray()
             res.send(result)
-       })
-  
+        })
+        app.get("/recipes/:id", async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const result = await recipescoll.findOne(query)
+            res.send(result)
+        })
+
+        // cook-book
+
+
+        app.post("/cook-book", async (req, res) => {
+
+            const data = req.body
+            const result = await cookbookcoll.insertOne(data)
+            res.send(result)
+        })
+
 
 
 
@@ -62,7 +82,7 @@ async function run() {
             'Pinged your deployment. You successfully connected to MongoDB!'
         )
     } finally {
-       
+
     }
 }
 run().catch(console.dir)
