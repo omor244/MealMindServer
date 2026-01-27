@@ -20,6 +20,7 @@ const client = new MongoClient(process.env.MONGODB_URI, {
 async function run() {
     const db = client.db("MEAL-MIND")
     const usercoll = db.collection('users')
+    const recipescoll = db.collection('recipes')
     try {
 
         app.post('/users', async (req, res) => {
@@ -38,8 +39,18 @@ async function run() {
                 
             }
 
-     })
-
+        })
+        app.post("/recipes", async (req, res) => {
+            
+            const data = req.body
+            const result = await recipescoll.insertOne(data)
+            res.send(result)
+        })
+        app.get("/recipes", async (req, res) => {
+           
+            const result = await recipescoll.find().toArray()
+            res.send(result)
+       })
   
 
 
