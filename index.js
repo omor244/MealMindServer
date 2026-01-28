@@ -41,10 +41,28 @@ async function run() {
             }
 
         })
+
         app.post("/recipes", async (req, res) => {
 
             const data = req.body
             const result = await recipescoll.insertOne(data)
+            res.send(result)
+        })
+
+        app.patch("/recipes/:id", async (req, res) => {
+            const id = req.params.id 
+            const query = { _id: new ObjectId(id) }
+            
+            const data = req.body
+             
+            const updatedDoc = {
+                $set: {
+
+                    status: data.status
+                }
+            }
+
+            const result = await recipescoll.updateOne(query, updatedDoc)
             res.send(result)
         })
         app.get("/recipes", async (req, res) => {
