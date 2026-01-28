@@ -100,6 +100,22 @@ async function run() {
             const result = await recipescoll.updateOne(query, updatedDoc)
             res.send(result)
         })
+        app.patch("/recipes/featured/:id", async (req, res) => {
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+
+            const data = req.body
+
+            const updatedDoc = {
+                $set: {
+                    isFeatured: data.isFeatured
+                }
+            }
+     
+            console.log(updatedDoc)
+            const result = await recipescoll.updateOne(query, updatedDoc)
+            res.send(result)
+        })
 
         app.patch("/category/recipes/:id", async (req, res) => {
             const id = req.params.id
@@ -177,6 +193,26 @@ async function run() {
             
             const data = req.body 
             const result = await reviewscoll.insertOne(data)
+            res.send(result)
+        })
+        app.get("/review", async (req, res) => {
+            
+            
+            const result = await reviewscoll.find().toArray()
+            res.send(result)
+        })
+        app.get("/review/:id", async (req, res) => {
+            
+            const id = req.params.id 
+            const query = { recipeId: id }
+            const result = await reviewscoll.find(query).toArray()
+            res.send(result)
+        })
+        app.delete("/reviews/:id", async (req, res) => {
+            
+            const id = req.params.id 
+            const query = { _id: new ObjectId(id) }
+            const result = await reviewscoll.deleteOne(query)
             res.send(result)
         })
 
