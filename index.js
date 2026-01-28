@@ -41,6 +41,29 @@ async function run() {
             }
 
         })
+        app.get('/users', async (req, res) => {
+
+            const result = await usercoll.find().toArray()
+
+            res.send(result)
+
+
+        })
+        app.patch('/users/:id', async (req, res) => {
+            const data = req.body
+            const id = req.params.id
+            const query = { _id: new ObjectId(id) }
+            const updatedDoc = {
+                $set: {
+                    role: data?.role
+                }
+            }
+            const result = await usercoll.updateOne(query, updatedDoc)
+
+            res.send(result)
+
+
+        })
 
         app.post("/recipes", async (req, res) => {
 
@@ -50,11 +73,11 @@ async function run() {
         })
 
         app.patch("/recipes/:id", async (req, res) => {
-            const id = req.params.id 
+            const id = req.params.id
             const query = { _id: new ObjectId(id) }
-            
+
             const data = req.body
-             
+
             const updatedDoc = {
                 $set: {
 
@@ -66,7 +89,7 @@ async function run() {
             res.send(result)
         })
         app.delete("/recipes/:id", async (req, res) => {
-            const id = req.params.id 
+            const id = req.params.id
             const query = { _id: new ObjectId(id) }
             const result = await recipescoll.deleteOne(query)
             res.send(result)
@@ -81,7 +104,7 @@ async function run() {
             const query = {}
 
             if (tremmedSearch.length > 0) {
-                query.name = {$regex: tremmedSearch, $options: 'i'}
+                query.name = { $regex: tremmedSearch, $options: 'i' }
             }
             const result = await recipescoll.find(query).toArray()
             res.send(result)
@@ -109,7 +132,7 @@ async function run() {
 
             const email = req.params.email
 
-            const query = {email: email}
+            const query = { email: email }
             const result = await usercoll.findOne(query)
             res.send(result)
         })
