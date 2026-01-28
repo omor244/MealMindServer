@@ -234,6 +234,13 @@ async function run() {
             const result = await reviewscoll.find(query).toArray()
             res.send(result)
         })
+        app.get("/reviews/:email", async (req, res) => {
+            
+            const email = req.params.email
+            const query = { userEmail: email }
+            const result = await reviewscoll.find(query).toArray()
+            res.send(result)
+        })
         app.delete("/reviews/:id", async (req, res) => {
             
             const id = req.params.id 
