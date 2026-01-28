@@ -112,10 +112,19 @@ async function run() {
                 }
             }
      
-            console.log(updatedDoc)
+           
             const result = await recipescoll.updateOne(query, updatedDoc)
             res.send(result)
         })
+        app.get('/recipes/featured', async (req, res) => {
+          
+            const result = await recipescoll.aggregate([
+                { $match: { isFeatured: false } },
+                { $sample: { size: 4 } }
+            ]).toArray();
+
+            res.send(result);
+        });
 
         app.patch("/category/recipes/:id", async (req, res) => {
             const id = req.params.id
@@ -171,7 +180,24 @@ async function run() {
         app.post("/weeklyPlan", async (req, res) => {
 
             const data = req.body
+
+           
             const result = await weeklyPlancoll.insertOne(data)
+            res.send(result)
+        })
+
+        app.get("/weeklyPlan/:email", async (req, res) => {
+
+            const email = req.params.email
+            const query = {userEmail: email }
+            const result = await weeklyPlancoll.find(query).toArray()
+            res.send(result)
+        })
+        app.delete("/weeklyPlan/:id", async (req, res) => {
+
+            const id = req.params.id
+            const query = {_id: new ObjectId(id) }
+            const result = await weeklyPlancoll.deleteOne(query)
             res.send(result)
         })
 
@@ -214,9 +240,41 @@ async function run() {
             const query = { _id: new ObjectId(id) }
             const result = await reviewscoll.deleteOne(query)
             res.send(result)
-        })
+        }) 
 
 
+        // user stats
+ 
+        app.get('/admin-stats', async (req, res) => {
+        
+                
+                const users = await usercoll.countDocuments();
+                const recipes = await recipescoll.countDocuments();
+                const reviews = await reviewscoll.countDocuments();
+
+                const featured = await recipescoll.countDocuments({ isFeatured: false });
+
+           
+                res.send({
+                    users,
+                    recipes,
+                    reviews,
+                    featured
+                });
+            
+        });
+ 
+        app.get('/user-stats/:email', async (req, res) => {
+            const email = req.params.email;
+           
+             
+                const reviewsCount = await reviewscoll.countDocuments({ userEmail: email });
+                res.send({
+                    reviewsCount,
+                   
+                });
+             
+        });
 
 
 
