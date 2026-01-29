@@ -9,6 +9,24 @@ const port = 3000 || process.env.PORT
 app.use(cors())
 app.use(express.json())
 
+const verifyJWT = async (req, res, next) => {
+  const token = req?.headers?.authorization?.split(' ')[1]
+    console.log(token)
+    
+    return
+    
+  if (!token) return res.status(401).send({ message: 'Unauthorized Access!' })
+  try {
+    const decoded = await admin.auth().verifyIdToken(token)
+    req.tokenEmail = decoded.email
+    console.log(decoded)
+    next()
+  } catch (err) {
+    console.log(err)
+    return res.status(401).send({ message: 'Unauthorized Access!', err })
+  }
+}
+
 const client = new MongoClient(process.env.MONGODB_URI, {
     serverApi: {
         version: ServerApiVersion.v1,
