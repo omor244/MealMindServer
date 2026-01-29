@@ -5,20 +5,29 @@ const cors = require('cors')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const port = 3000 || process.env.PORT
 
+const admin = require("firebase-admin");
+
+const serviceAccount = require("./serviceAccountKey.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
+
+
 
 app.use(cors())
 app.use(express.json())
 
 const verifyJWT = async (req, res, next) => {
   const token = req?.headers?.authorization?.split(' ')[1]
-    console.log(token)
+    console.log("fromt jwt", token)
     
-    return
-    
+   
+
   if (!token) return res.status(401).send({ message: 'Unauthorized Access!' })
   try {
     const decoded = await admin.auth().verifyIdToken(token)
-    req.tokenEmail = decoded.email
+    // req.tokenEmail = decoded.email
     console.log(decoded)
     next()
   } catch (err) {
@@ -60,7 +69,7 @@ async function run() {
             }
 
         })
-        app.get('/users', async (req, res) => {
+        app.get('/users', verifyJWT, async (req, res) => {
 
             const result = await usercoll.find().toArray()
 
@@ -95,14 +104,14 @@ async function run() {
 
         })
 
-        app.post("/recipes", async (req, res) => {
+        app.post("/recipes", verifyJWT, async (req, res) => {
 
             const data = req.body
             const result = await recipescoll.insertOne(data)
             res.send(result)
         })
 
-        app.patch("/recipes/:id", async (req, res) => {
+        app.patch("/recipes/:id", verifyJWT, async (req, res) => {
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
 
@@ -118,7 +127,7 @@ async function run() {
             const result = await recipescoll.updateOne(query, updatedDoc)
             res.send(result)
         })
-        app.patch("/recipes/featured/:id", async (req, res) => {
+        app.patch("/recipes/featured/:id", verifyJWT, async (req, res) => {
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
 
@@ -144,7 +153,7 @@ async function run() {
             res.send(result);
         });
 
-        app.patch("/category/recipes/:id", async (req, res) => {
+        app.patch("/category/recipes/:id", verifyJWT, async (req, res) => {
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
 
@@ -164,7 +173,7 @@ async function run() {
             const result = await recipescoll.updateOne(query, updatedDoc)
             res.send(result)
         })
-        app.delete("/recipes/:id", async (req, res) => {
+        app.delete("/recipes/:id", verifyJWT, async (req, res) => {
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
             const result = await recipescoll.deleteOne(query)
@@ -204,14 +213,14 @@ async function run() {
             res.send(result)
         })
 
-        app.get("/weeklyPlan/:email", async (req, res) => {
+        app.get("/weeklyPlan/:email", verifyJWT, async (req, res) => {
 
             const email = req.params.email
             const query = {userEmail: email }
             const result = await weeklyPlancoll.find(query).toArray()
             res.send(result)
         })
-        app.delete("/weeklyPlan/:id", async (req, res) => {
+        app.delete("/weeklyPlan/:id", verifyJWT, async (req, res) => {
 
             const id = req.params.id
             const query = {_id: new ObjectId(id) }
@@ -221,7 +230,7 @@ async function run() {
 
 
         // users collections 
-        app.get("/user/role/:email", async (req, res) => {
+        app.get("/user/role/:email", verifyJWT, async (req, res) => {
 
             const email = req.params.email
 
