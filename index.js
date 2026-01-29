@@ -69,7 +69,7 @@ async function run() {
             }
 
         })
-        app.get('/users', verifyJWT, async (req, res) => {
+        app.get('/users',  async (req, res) => {
 
             const result = await usercoll.find().toArray()
 
@@ -77,7 +77,7 @@ async function run() {
 
 
         })
-        app.patch('/users/:id', async (req, res) => {
+        app.patch('/users/:id', verifyJWT, async (req, res) => {
             const data = req.body
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
@@ -92,7 +92,7 @@ async function run() {
 
 
         })
-        app.delete('/users/:id', async (req, res) => {
+        app.delete('/users/:id', verifyJWT, async (req, res) => {
         
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
@@ -143,7 +143,7 @@ async function run() {
             const result = await recipescoll.updateOne(query, updatedDoc)
             res.send(result)
         })
-        app.get('/recipes/featured', async (req, res) => {
+        app.get('/recipes/featured', verifyJWT, async (req, res) => {
           
             const result = await recipescoll.aggregate([
                 { $match: { isFeatured: false } },
@@ -173,7 +173,7 @@ async function run() {
             const result = await recipescoll.updateOne(query, updatedDoc)
             res.send(result)
         })
-        app.delete("/recipes/:id", verifyJWT, async (req, res) => {
+        app.delete("/recipes/:id",  async (req, res) => {
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
             const result = await recipescoll.deleteOne(query)
@@ -194,7 +194,7 @@ async function run() {
             const result = await recipescoll.find(query).toArray()
             res.send(result)
         })
-        app.get("/recipes/:id", async (req, res) => {
+        app.get("/recipes/:id",  async (req, res) => {
             const id = req.params.id
             const query = { _id: new ObjectId(id) }
             const result = await recipescoll.findOne(query)
@@ -204,7 +204,7 @@ async function run() {
         // cook-book
 
 
-        app.post("/weeklyPlan", async (req, res) => {
+        app.post("/weeklyPlan", verifyJWT, async (req, res) => {
 
             const data = req.body
 
@@ -230,7 +230,7 @@ async function run() {
 
 
         // users collections 
-        app.get("/user/role/:email", verifyJWT, async (req, res) => {
+        app.get("/user/role/:email",  async (req, res) => {
 
             const email = req.params.email
 
@@ -242,33 +242,33 @@ async function run() {
 
         // review api
 
-        app.post("/review", async (req, res) => {
+        app.post("/review", verifyJWT, async (req, res) => {
             
             const data = req.body 
             const result = await reviewscoll.insertOne(data)
             res.send(result)
         })
-        app.get("/review", async (req, res) => {
+        app.get("/review",  async (req, res) => {
             
             
             const result = await reviewscoll.find().toArray()
             res.send(result)
         })
-        app.get("/review/:id", async (req, res) => {
+        app.get("/review/:id",  async (req, res) => {
             
             const id = req.params.id 
             const query = { recipeId: id }
             const result = await reviewscoll.find(query).toArray()
             res.send(result)
         })
-        app.get("/reviews/:email", async (req, res) => {
+        app.get("/reviews/:email", verifyJWT, async (req, res) => {
             
             const email = req.params.email
             const query = { userEmail: email }
             const result = await reviewscoll.find(query).toArray()
             res.send(result)
         })
-        app.delete("/reviews/:id", async (req, res) => {
+        app.delete("/reviews/:id", verifyJWT, async (req, res) => {
             
             const id = req.params.id 
             const query = { _id: new ObjectId(id) }
